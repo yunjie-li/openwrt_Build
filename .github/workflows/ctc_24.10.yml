@@ -163,16 +163,16 @@ jobs:
         rm -rf sha256sums
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         
-    - name: Deploy imagebuilder to server
-      uses: easingthemes/ssh-deploy@main
-      with:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        ARGS: "-avzr --exclude="
-        SOURCE: firmware/
-        REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-        REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
-        REMOTE_USER: root
-        TARGET: "/www/wwwroot/${{ secrets.REMOTE_HOST }}/op/firmware/${{matrix.target}}/"       
+    # - name: Deploy imagebuilder to server
+    #   uses: easingthemes/ssh-deploy@main
+    #   with:
+    #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+    #     ARGS: "-avzr --exclude="
+    #     SOURCE: firmware/
+    #     REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+    #     REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+    #     REMOTE_USER: root
+    #     TARGET: "/www/wwwroot/${{ secrets.REMOTE_HOST }}/op/firmware/${{matrix.target}}/"       
       
     - name: Upload firmware directory
       uses: actions/upload-artifact@main
@@ -181,29 +181,29 @@ jobs:
         name: ${{ env.date3 }} _${{matrix.target}}
         path: ${{ env.FIRMWARE }}
         
-    - name: Set Up Docker Buildx
-      uses: docker/setup-buildx-action@master
-      if: env.DOCKER_ID && env.DOCKER_PASSWD
+    # - name: Set Up Docker Buildx
+    #   uses: docker/setup-buildx-action@master
+    #   if: env.DOCKER_ID && env.DOCKER_PASSWD
 
-    - name: Login To DockerHub
-      uses: docker/login-action@master
-      if: env.DOCKER_ID && env.DOCKER_PASSWD
-      with:
-        username: ${{ secrets.DOCKER_ID }}
-        password: ${{ secrets.DOCKER_PASSWD }}
+    # - name: Login To DockerHub
+    #   uses: docker/login-action@master
+    #   if: env.DOCKER_ID && env.DOCKER_PASSWD
+    #   with:
+    #     username: ${{ secrets.DOCKER_ID }}
+    #     password: ${{ secrets.DOCKER_PASSWD }}
         
-    - name: Build and push docker image
-      uses: docker/build-push-action@master
-      continue-on-error: true
-      if: env.DOCKER_ID && env.DOCKER_PASSWD && ! contains(github.event.action, 'noser')
-      with:
-        platforms: ${{ env.ARCH }}
-        file: Dockerfile
-        context: .
-        push: true
-        tags: |
-          ${{ secrets.DOCKER_ID }}/openwrt-6p:${{matrix.target}}
-          ${{ env.DOCKERTAG }}         
+    # - name: Build and push docker image
+    #   uses: docker/build-push-action@master
+    #   continue-on-error: true
+    #   if: env.DOCKER_ID && env.DOCKER_PASSWD && ! contains(github.event.action, 'noser')
+    #   with:
+    #     platforms: ${{ env.ARCH }}
+    #     file: Dockerfile
+    #     context: .
+    #     push: true
+    #     tags: |
+    #       ${{ secrets.DOCKER_ID }}/openwrt-6p:${{matrix.target}}
+    #       ${{ env.DOCKERTAG }}         
 
     - name: Upload firmware to cowtransfer
       id: cowtransfer
